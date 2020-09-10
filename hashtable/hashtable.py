@@ -49,7 +49,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.slots / self.capacity
+        # return self.get_num_slots() / self.capacity
 
     def fnv1(self, key):
         """
@@ -90,8 +91,24 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.slots += 1
-        self.storage[index] = value
+        node = HashTableEntry(key, value)
+        current = self.storage[index]
+
+        if current:
+            print("here")
+            if current.key == key:
+                current.value = value
+            while current:
+                if current.key == key:
+                    current.value = value
+                elif current.next == None:
+                    current.next = node
+                    self.slots += 1
+
+                current = current.next
+        else:
+            self.storage[index] = node
+            self.slots += 1
 
     def delete(self, key):
         """
@@ -102,8 +119,24 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.slots -= 1
-        self.storage[index] = None
+        # self.slots -= 1
+        # self.storage[index] = None
+        nodeToDel = self.storage[index]
+        if nodeToDel:
+            prevNode = None
+            while nodeToDel:
+                if nodeToDel.key == key:
+                    if prevNode is None:
+                        self.storage[index] = nodeToDel.next
+                        self.slots -= 1
+                    else:
+                        prevNode.next = nodeToDel.next
+                        self.slots -= 1
+                    return
+                prevNode = nodeToDel
+                nodeToDel = nodeToDel.next
+        else:
+            return "nothing to delete"
 
     def get(self, key):
         """
@@ -114,7 +147,17 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.storage[index]
+        # return self.storage[index]
+        node = self.storage[index]
+        if node:
+            # prevNode = None
+            while node:
+                if node.key == key:
+                    return node.value
+                else:
+                    node = node.next
+        else:
+            return None
 
     def resize(self, new_capacity):
         """
